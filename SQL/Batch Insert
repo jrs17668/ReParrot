@@ -1,0 +1,108 @@
+USE [ReParrot]
+GO
+/****** Object:  StoredProcedure [dbo].[Packages_InsertV2]    
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================
+-- Author:	Jason ----
+-- Create date: 2/6/2023
+-- Description:	Batch insert for packages & bridge table to assign new packages to an organization.
+-- Code Reviewer:  Lauren ----
+
+
+-- MODIFIED BY: 
+-- MODIFIED DATE: 
+-- Code Reviewer: 
+-- Note: 
+-- =============================================
+
+ALTER proc [dbo].[Packages_InsertV2]
+
+				 @BatchServiceIds  dbo.id_Udt READONLY
+				,@Name nvarchar(100)
+				,@Description nvarchar(500)
+				,@OrganizationId int
+				,@IsFixed bit
+				,@PackageCost decimal(18,2)
+				,@CreatedBy int
+				,@Id int OUTPUT
+
+as
+
+/*---------------TEST CODE------------------
+	DECLARE @Id int = 0;
+	Declare	  @Name nvarchar(100) = 'GeneralCarPackage'
+			 ,@Description nvarchar(500) = 'A package of general car maintece services'
+			 ,@OrganizationId int = 152
+			 ,@IsFixed bit = 1
+			 ,@PackageCost decimal(18,2) = 100.10
+			 ,@CreatedBy int = 7
+
+	Declare @serviceIds dbo.id_Udt
+			insert into @serviceIds (Id)
+			select top 5 Id
+			from dbo.Services
+
+	Select * 
+	from @serviceIds
+
+	Execute [dbo].[Packages_InsertV2]
+				 @serviceIds
+				,@Name 
+				,@Description 
+				,@OrganizationId
+				,@IsFixed 
+				,@PackageCost 
+				,@CreatedBy
+				,@Id OUTPUT
+
+	SELECT *
+	FROM [dbo].[Packages]
+	WHERE Id = @Id
+
+
+
+*/
+BEGIN
+
+
+
+INSERT INTO [dbo].[Packages]
+           ([Name]
+           ,[Description]
+           ,[OrganizationId]
+           ,[IsFixed]
+           ,[PackageCost]
+           ,[CreatedBy]
+           ,[ModifiedBy]
+		   )
+     VALUES
+        (@Name
+		   ,@Description
+		   ,@OrganizationId
+		   ,@IsFixed
+		   ,@PackageCost
+		   ,@CreatedBy
+		   ,@CreatedBy)
+
+
+
+		Set @Id = SCOPE_IDENTITY();
+
+INSERT INTO dbo.PackagedServices
+			([ServiceId]
+			,[PackageId])
+
+		SELECT 
+			 Id
+			,@Id
+		from @BatchServiceIds
+
+		-- let insert into package service file 
+END
+
+
