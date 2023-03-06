@@ -1,0 +1,147 @@
+USE [ReParrot]
+GO
+/****** Object:  StoredProcedure [dbo].[Packages_SelectAll_Search_Paginated]   
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author: Jason ----
+-- Create date: 2/27/2023
+-- Description: Selects Packages with Search (Paginated)
+-- Code Reviewer: Colin ----
+
+-- MODIFIED BY: 
+-- MODIFIED DATE:
+-- Code Reviewer:
+-- Note:
+-- =============================================
+
+ALTER proc [dbo].[Packages_SelectAll_Search_Paginated] 
+
+								  @PageIndex int
+								, @PageSize int
+								, @Query nvarchar(100)
+
+/* --------------TEST CODE-------------
+
+Declare @PageIndex int = 0
+      , @PageSize int = 100
+	  , @Query nvarchar(100) = 'big'
+
+	Execute dbo.Packages_SelectAll_Search_Paginated 
+		      @PageIndex
+			, @PageSize
+			, @Query
+
+
+*/
+
+as
+
+BEGIN
+	
+	Declare @offset int = @PageIndex * @PageSize
+
+SELECT p.Id
+      ,p.Name
+      ,p.Description
+      ,p.OrganizationId
+	    ,o.Name as OrganizationName
+	    ,o.LogoUrl as LogoUrl
+      ,p.IsFixed
+      ,p.PackageCost
+	    ,Services = (
+		    SELECT s.Id
+		  	  ,s.Name
+		  	  ,s.SKU
+		  	  ,s.Description
+		    	,s.OrganizationId
+		    	,o.Name as OrganizationName
+		    	,ServiceType = (
+				  		JSON_QUERY((SELECT st.Id  as Id
+				  		,st.Name as Name
+				  		FOR JSON PATH, WITHOUT_ARRAY_WRAPPER))
+	  	  	)
+
+		    ,UnitType = (
+			  			JSON_QUERY((SELECT ut.Id  as Id
+			  			,ut.Name as Name
+			  			FOR JSON PATH, WITHOUT_ARRAY_WRAPPER))
+		     	)	
+		    	,s.UnitCost
+		    	,s.EstimatedDuration
+		   	,CreatedBy = (
+			  			JSON_QUERY((SELECT u.Id 
+		  								,u.FirstName 
+				  						,u.Mi 
+			  							,u.LastName 
+			  							,u.AvatarUrl 
+				  		FOR JSON PATH, WITHOUT_ARRAY_WRAPPER))
+		    	)
+		  	
+		  	,ModifiedBy = (
+			  			JSON_QUERY((SELECT u.Id 
+				  						,u.FirstName 
+				  						,u.Mi 
+				  						,u.LastName 
+				  						,u.AvatarUrl 
+				  		FOR JSON PATH, WITHOUT_ARRAY_WRAPPER))
+		  	)
+
+        from dbo.Services as s inner join dbo.PackagedServices as ps
+				ON ps.ServiceId = s.Id
+				INNER JOIN dbo.ServiceTypes as st 
+				ON s.ServiceTypeId = st.Id
+				INNER JOIN dbo.UnitTypes as ut
+				ON s.UnitTypeId = ut.Id
+				INNER JOIN dbo.Users as u
+				ON s.CreatedBy = u.Id
+        Where ps.PackageId = p.Id 
+		  	FOR JSON PATH
+  	  ) 
+  	  ,l.Id as LocationId
+	    ,l.LineOne 
+	    ,l.LineTwo
+	    ,l.City
+	    ,l.StateId as StateId
+  	  ,s.Name as State
+	    ,l.Zip
+      ,p.IsPublished
+      ,p.IsDeleted
+      ,u.Id as CreatedById
+  	  ,u.FirstName 
+	    ,u.Mi 
+	    ,u.LastName
+  	  ,u.AvatarUrl
+	    ,u.Id as ModifiedBy
+  	  ,u.FirstName
+	    ,u.Mi
+	    ,u.LastName
+	    ,u.AvatarUrl
+      ,p.DateCreated
+      ,p.DateModified
+	  ,TotalCount = COUNT(1) OVER()
+ FROM [dbo].[Packages] as p 
+	inner join dbo.Organizations as o
+	ON p.OrganizationId = o.Id
+	inner join dbo.Locations as l
+	ON o.PrimaryLocationId = l.Id
+	inner join dbo.States as s
+	ON l.StateId = s.Id
+	inner join dbo.Users as u
+	ON p.CreatedBy = u.Id
+ 
+  WHERE  (p.Name like '%' + @Query + '%') 
+  AND (p.IsDeleted = 0)
+  OR  (p.Description like '%' + @Query + '%')
+  AND (p.IsDeleted = 0)
+  OR (o.Name like '%' + @Query + '%')
+  AND (p.IsDeleted = 0)
+
+  ORDER BY p.Name
+
+  OFFSET @offSet Rows
+  Fetch Next @PageSize Rows ONLY
+
+End
