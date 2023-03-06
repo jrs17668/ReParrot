@@ -1,0 +1,60 @@
+USE [ReParrot]
+GO
+/****** Object:  StoredProcedure [dbo].[Packages_Delete]    
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:	Jason ----
+-- Create date: 1/25/2023
+-- Description:	Packages Delete (Update @IsDeleted status to true by @Id of package)
+-- Code Reviewer: Lauren ----
+
+
+-- MODIFIED BY: author
+-- MODIFIED DATE:
+-- Code Reviewer: 
+-- Note: 
+-- =============================================
+
+ALTER proc [dbo].[Packages_Delete]
+				@ModifiedBy int
+				,@Id int 
+
+as
+
+/*---------------TEST CODE------------------
+	
+	Declare	  @Id int = 1	
+			 
+	Declare @ModifiedBy int = 1
+
+	SELECT *
+	FROM [dbo].[Packages]
+	WHERE Id =@Id
+
+	Execute [dbo].[Packages_Delete]
+						@ModifiedBy
+						,@Id
+
+	SELECT *
+	FROM [dbo].[Packages]
+	WHERE Id =@Id
+
+
+*/
+BEGIN
+
+		Declare @datNow datetime2 = getutcdate()
+				
+
+
+	  UPDATE [dbo].[Packages]
+        SET  [IsDeleted] = 1
+		   ,[ModifiedBy] = @ModifiedBy
+		   ,[DateModified] = @datNow   
+     Where Id = @Id
+
+END
+
