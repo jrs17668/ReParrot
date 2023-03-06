@@ -1,0 +1,116 @@
+import React from "react";
+import { Card, Row, Col, ListGroup, Image } from "react-bootstrap";
+import PropTypes from "prop-types";
+import logger from "sabio-debug";
+import { Clipboard, DollarSign } from "react-feather";
+import "./packageService.css";
+import { useNavigate } from "react-router-dom";
+
+const _logger = logger.extend("AutoService");
+
+const Package = (props) => {
+  const aPackage = props.package;
+  const currentUser = props.currentUser;
+  _logger("currentUser", currentUser);
+
+  const navigate = useNavigate();
+
+  const onPackageClicked = (e) => {
+    e.preventDefault();
+    navigateToViewMore(aPackage);
+  };
+
+  const navigateToViewMore = (aPackage) => {
+    const state = {
+      type: "Package_VIEW",
+      payload: aPackage,
+      currentUser: props.currentUser,
+    };
+    navigate(`/packages/${aPackage.id}`, { state });
+  };
+
+  const mapServices = (aService) => {
+    return <label className="border rounded mx-1 ">{aService.name}</label>;
+  };
+
+  return (
+    <React.Fragment>
+      <div className="container mb-2">
+        <Card className="mb-2 card-hover card-click" onClick={onPackageClicked}>
+          <Row className="g-0">
+            <Col lg={9} md={9} sm={9}>
+              <Card.Body>
+                <Row>
+                  <h3 className="mb-2 text-truncate-line-2">{aPackage.name}</h3>
+                  <h4 className="mb-2 text-truncate-line-2">
+                    By {aPackage.organizationName}
+                  </h4>
+                </Row>
+                <Row>
+                  <ListGroup as="ul" bsPrefix="list-inline" className="mb-3">
+                    <ListGroup.Item as="li" bsPrefix="list-inline-item">
+                      {aPackage.description}
+                    </ListGroup.Item>
+                  </ListGroup>
+                </Row>
+                <Row>
+                  <ListGroup.Item as="li" bsPrefix="list-inline-item">
+                    <Clipboard className="clipboard-icon mb-2" />
+                    {aPackage.services?.map(mapServices)}
+                  </ListGroup.Item>
+                </Row>
+                <ListGroup.Item as="li" bsPrefix="list-inline-item">
+                  <DollarSign className="dollarsign-icon mb-2" />
+                  {aPackage.packageCost}
+                </ListGroup.Item>
+              </Card.Body>
+            </Col>
+            <Col>
+              <Image
+                className="logo-brand pt-5"
+                src={aPackage.logoUrl}
+                alt="Brand logo"
+              />
+            </Col>
+          </Row>
+        </Card>
+      </div>
+    </React.Fragment>
+  );
+};
+
+Package.propTypes = {
+  package: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    organizationId: PropTypes.number.isRequired,
+    organizationName: PropTypes.string.isRequired,
+    logoUrl: PropTypes.string.isRequired,
+    packageCost: PropTypes.number.isRequired,
+    services: PropTypes.shape([
+      {
+        name: PropTypes.string.isRequired,
+      },
+    ]),
+    createdBy: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      firstName: PropTypes.string.isRequired,
+      mi: PropTypes.string.isRequired,
+      lastName: PropTypes.string.isRequired,
+      avatarUrl: PropTypes.string.isRequired,
+    }),
+    modifiedBy: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      firstName: PropTypes.string.isRequired,
+      mi: PropTypes.string.isRequired,
+      lastName: PropTypes.string.isRequired,
+      avatarUrl: PropTypes.string.isRequired,
+    }),
+  }),
+  currentUser: PropTypes.shape({
+    roles: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }),
+};
+
+export default Package;
