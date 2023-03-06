@@ -1,0 +1,18 @@
+const packageRoutes = [
+  {
+    path: "/packages/add",
+    name: "Add Package",
+    element: PackageAdd,
+    roles: ["OrgAdmin"],
+    exact: true,
+    isAnonymous: false,
+  },
+  {
+    path: `/packages/:packageId/edit`,
+    name: "Edit Package",
+    element: PackageAdd,
+    roles: ["OrgAdmin"],
+    exact: true,
+    isAnonymous: false,
+  },
+];
