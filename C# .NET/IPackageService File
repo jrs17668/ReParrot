@@ -1,0 +1,23 @@
+namespace ReParrot.Services.Interfaces
+{
+    public interface IPackagesService
+    {
+        int AddPackage(PackageAddRequest model, int userId);
+
+        void UpdatePackage(PackageUpdateRequest model, int userId);
+
+        Package GetById(int id);
+
+        Paged<Package> GetByOrgId(int pageIndex, int pageSize, int orgId);
+
+        Paged<Package> GetByOrgIdSearch(int pageIndex, int pageSize, int orgId, string query);
+
+        Paged<Package> GetAll(int pageIndex, int pageSize);
+
+        Paged<Package> GetAllSearch(int pageIndex, int pageSize, string query);
+
+        void DeletePackageById(int id, int userId);
+        
+        List<LookUp> GetByOrgIdAd(int id);
+    }
+}
