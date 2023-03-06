@@ -1,0 +1,14 @@
+
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    organizationId: currentUser.organizationId,
+    isChangeable: false,
+    cost: "",
+    serviceIds: [],
+  });
+
+  const [services, setServices] = useState({
+    originalServices: [],
+    mappedServices: [],
+  });
