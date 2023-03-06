@@ -1,0 +1,32 @@
+ useEffect(() => {
+    if (props.currentUser.roles.includes("OrgAdmin")) {
+      if (paginate.query?.length > 0) {
+        packageService
+          .getByOrgIdSearchPag(
+            paginate.index,
+            paginate.pageSize,
+            paginate.orgId,
+            paginate.query
+          )
+          .then(onGetPackagesSuccess)
+          .catch(onGetPackagesError);
+      } else if (!paginate.query) {
+        packageService
+          .getByOrgIdPag(paginate.index, paginate.pageSize, paginate.orgId)
+          .then(onGetPackagesSuccess)
+          .catch(onGetPackagesError);
+      }
+    } else {
+      if (paginate.query?.length > 0) {
+        packageService
+          .getAllSearchPag(paginate.index, paginate.pageSize, paginate.query)
+          .then(onGetPackagesSuccess)
+          .catch(onGetPackagesError);
+      } else if (!paginate.query) {
+        packageService
+          .getAllPag(paginate.index, paginate.pageSize)
+          .then(onGetPackagesSuccess)
+          .catch(onGetPackagesError);
+      }
+    }
+  }, [paginate.index, paginate.query]);
