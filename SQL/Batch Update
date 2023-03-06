@@ -1,0 +1,113 @@
+USE [ReParrot]
+GO
+/****** Object:  StoredProcedure [dbo].[Packages_UpdateV2]    
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================
+-- Author:	Jason ----
+-- Create date: 2/8/2023
+-- Description:	Packages batch update to change a package and assign record to bridge table.
+-- Code Reviewer:  Lauren ----
+
+
+-- MODIFIED BY: 
+-- MODIFIED DATE: 
+-- Code Reviewer: 
+-- Note: 
+-- =============================================
+
+ALTER proc [dbo].[Packages_UpdateV2]
+
+				@BatchServiceIds  dbo.id_Udt READONLY
+				,@Id int 
+				,@Name nvarchar(100)
+				,@Description nvarchar(500)
+				,@OrganizationId int
+				,@IsFixed bit
+				,@PackageCost decimal(18,2)
+				,@IsPublished bit
+				,@ModifiedBy int
+				
+
+as
+
+/*---------------TEST CODE------------------
+	
+	Declare	  @Id int = 1
+			 ,@Name nvarchar(100) = '1000 Mile Package'
+			 ,@Description nvarchar(500) = 'A package of general car services'
+			 ,@OrganizationId int = 37
+			 ,@IsFixed bit = 1
+			 ,@PackageCost decimal(18,2) = 100.10
+			 ,@IsPublished bit = 0
+			 ,@ModifiedBy int = 7
+
+	Declare  @serviceIds dbo.id_Udt
+			 insert into @serviceIds (Id)
+			 select top 5 Id
+			 from dbo.Services
+
+	Select * 
+	from @serviceIds
+
+	SELECT *
+	FROM [dbo].[Packages]
+	WHERE Id =@Id
+
+	Execute [dbo].[Packages_UpdateV2]
+				@serviceIds
+				,@Id
+				,@Name 
+				,@Description 
+				,@OrganizationId 
+				,@IsFixed 
+				,@PackageCost 
+				,@IsPublished 
+				,@ModifiedBy 
+				
+
+	SELECT *
+	FROM [dbo].[Packages]
+	WHERE Id = @Id
+
+
+
+*/
+BEGIN
+
+		Declare @datNow datetime2 = getutcdate()
+
+
+	  UPDATE [dbo].[Packages]
+        SET  [Name] = @Name
+           ,[Description] = @Description
+           ,[OrganizationId] = @OrganizationId
+           ,[IsFixed] = @IsFixed
+           ,[PackageCost] = @PackageCost
+           ,[IsPublished] = @IsPublished
+           ,[ModifiedBy] = @ModifiedBy
+		   ,[DateModified] = @datNow   
+     Where Id = @Id
+
+	 DELETE from dbo.PackagedServices
+			WHERE ServiceId = ServiceId
+			and PackageId = @Id
+
+	INSERT INTO dbo.PackagedServices
+			([ServiceId]
+			,[PackageId])
+
+		SELECT 
+			 Id
+			,@Id
+		from @BatchServiceIds
+		
+			
+
+END
+
+
