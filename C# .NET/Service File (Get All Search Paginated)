@@ -1,0 +1,89 @@
+  public Paged<Package> GetAllSearch(int pageIndex, int pageSize, string query)
+        {
+            Paged<Package> pagedList = null;
+            List<Package> list = null;
+            int totalCount = 0;
+            string procName = "dbo.Packages_SelectAll_Search_Paginated";
+
+            _data.ExecuteCmd(procName, inputParamMapper: delegate (SqlParameterCollection col)
+            {
+                col.AddWithValue("@PageIndex", pageIndex);
+                col.AddWithValue("@PageSize", pageSize);
+                col.AddWithValue("@Query", query);
+            },
+             singleRecordMapper: delegate (IDataReader reader, short set)
+             {
+                 int startingIndex = 0;
+                 Package service = MapSinglePackage(reader, ref startingIndex);
+
+
+                 if (totalCount == 0)
+                 {
+                     totalCount = reader.GetSafeInt32(startingIndex++);
+                 }
+
+                 if (list == null)
+                 {
+                     list = new List<Package>();
+                 }
+
+                 list.Add(service);
+             }
+             );
+
+            if (list != null)
+            {
+                pagedList = new Paged<Package>(list, pageIndex, pageSize, totalCount);
+            }
+
+            return pagedList;
+        }
+        
+        
+        
+        
+        
+        //REUSABLE MAPPING FUNCTION
+         private static Package MapSinglePackage(IDataReader reader, ref int startingIndex)
+        {
+            Package package = new Package();
+            
+            package.Id = reader.GetSafeInt32(startingIndex++);
+            package.Name = reader.GetSafeString(startingIndex++);
+            package.Description = reader.GetSafeString(startingIndex++);
+            package.OrganizationId = reader.GetSafeInt32(startingIndex++);
+            package.OrganizationName = reader.GetSafeString(startingIndex++);
+            package.LogoUrl = reader.GetSafeString(startingIndex++);
+            package.IsFixed = reader.GetBoolean(startingIndex++);
+            package.PackageCost = reader.GetSafeDecimal(startingIndex++);
+            package.Services = reader.DeserializeObject<List<AutoService>>(startingIndex++);
+            package.Location = new BaseLocation();
+            package.Location.Id = reader.GetSafeInt32(startingIndex++);
+            package.Location.LineOne = reader.GetSafeString(startingIndex++);
+            package.Location.LineTwo = reader.GetSafeString(startingIndex++);
+            package.Location.City = reader.GetSafeString(startingIndex++);
+            package.Location.StateId = reader.GetSafeInt32(startingIndex++);
+            package.Location.State = reader.GetSafeString(startingIndex++);
+            package.Location.Zip = reader.GetSafeString(startingIndex++);
+            package.IsPublished = reader.GetBoolean(startingIndex++);
+            package.IsDeleted = reader.GetBoolean(startingIndex++);
+            BaseUser createdBy = new BaseUser();
+            createdBy.Id = reader.GetSafeInt32(startingIndex++);
+            createdBy.FirstName = reader.GetSafeString(startingIndex++);
+            createdBy.MI = reader.GetSafeString(startingIndex++);
+            createdBy.LastName = reader.GetSafeString(startingIndex++);
+            createdBy.AvatarUrl = reader.GetSafeString(startingIndex++);
+            package.CreatedBy = createdBy;
+            BaseUser modifiedBy = new BaseUser();
+            modifiedBy.Id = reader.GetSafeInt32(startingIndex++);
+            modifiedBy.FirstName = reader.GetSafeString(startingIndex++);
+            modifiedBy.MI = reader.GetSafeString(startingIndex++);
+            modifiedBy.LastName = reader.GetSafeString(startingIndex++);
+            modifiedBy.AvatarUrl = reader.GetSafeString(startingIndex++);
+            package.ModifiedBy = modifiedBy;
+            package.DateCreated = reader.GetSafeDateTime(startingIndex++);
+            package.DateModified = reader.GetSafeDateTime(startingIndex++);
+
+            return package;
+
+        }
