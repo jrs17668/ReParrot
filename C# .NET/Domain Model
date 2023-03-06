@@ -1,0 +1,36 @@
+namespace ReParrot.Models.Domain.Bundles
+{
+    public class Package
+    {
+        public int Id { get; set; }
+        
+        public string Name { get; set; }
+        
+        public string Description { get; set; }
+        
+        public int OrganizationId { get; set; }
+        
+        public string OrganizationName { get; set; }
+        
+        public string LogoUrl { get; set; }
+        
+        public bool IsFixed { get; set; }
+        
+        public decimal PackageCost { get; set; }
+
+        public List<AutoService> Services { get; set; }
+
+        public BaseLocation Location { get; set; }
+
+        public bool IsPublished { get; set; }
+
+        public bool IsDeleted { get; set; }
+
+        public BaseUser CreatedBy { get; set; }
+
+        public BaseUser ModifiedBy { get; set; }
+
+        public DateTime DateCreated { get; set; }
+
+        public DateTime DateModified { get; set; }
+    }
