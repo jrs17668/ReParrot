@@ -1,0 +1,25 @@
+namespace ReParrot.Models.Requests.Bundles
+{
+    public class PackageAddRequest
+    {
+        [Required]
+        [StringLength(100, MinimumLength = 2)]
+        public string Name { get; set; }
+        
+        [Required]
+        [StringLength(500, MinimumLength = 2)]
+        public string Description { get; set; }
+        
+        [Required]
+        public int OrganizationId { get; set; }
+        
+        [Required]
+        public bool IsFixed { get; set; }
+        
+        [Required]
+        public decimal PackageCost { get; set; }
+        
+        [Required]
+        public List<int> ServiceIds { get; set; }
+    }
+}
