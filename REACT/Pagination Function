@@ -1,0 +1,13 @@
+const onPageChange = (page) => {
+    if (props.currentUser.roles.includes("OrgAdmin")) {
+      packageService
+        .getByOrgIdPag(page - 1, paginate.pageSize, paginate.orgId)
+        .then(onGetPackagesSuccess)
+        .catch(onGetPackagesError);
+    } else {
+      packageService
+        .getAllPag(page - 1, paginate.pageSize)
+        .then(onGetPackagesSuccess)
+        .catch(onGetPackagesError);
+    }
+  };
