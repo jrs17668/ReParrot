@@ -1,0 +1,10 @@
+  const mapPackage = (aPackage) => {
+    return (
+      <Package
+        package={aPackage}
+        key={"Package" + aPackage.id}
+        onLocalClicked={onGetPackageDetail}
+        currentUser={currentUser}
+      />
+    );
+  };
