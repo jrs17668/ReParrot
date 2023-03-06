@@ -1,0 +1,91 @@
+ <Formik
+                        enableReinitialize={true}
+                        initialValues={formData}
+                        onSubmit={handleSubmit}
+                        validationSchema={PackageFormSchema}
+                      >
+                        {({ setFieldValue }) => (
+                          <FormikForm>
+                            <Row className="mb-3">
+                              <Form.Group as={Col} md="12">
+                                <Form.Label>Package Name</Form.Label>
+                                <Field
+                                  className="form-control"
+                                  type="text"
+                                  id="name"
+                                  name="name"
+                                  placeholder="e.g., 10000 Mile Service"
+                                />
+                                <ErrorMessage
+                                  name="name"
+                                  component="div"
+                                  className="has-error"
+                                />
+                              </Form.Group>
+                            </Row>
+                            <Row className="mb-3 ">
+                              <Form.Group as={Col} md="12">
+                                <Form.Label>Description</Form.Label>
+                                <Field
+                                  className="form-control"
+                                  rows="8"
+                                  as="textarea"
+                                  id="description"
+                                  name="description"
+                                  placeholder="Provide a Brief Description about this Package."
+                                />
+                                <ErrorMessage
+                                  name="description"
+                                  component="div"
+                                  className="has-error"
+                                />
+                              </Form.Group>
+                            </Row>
+                            <Row className="mb-3 ">
+                              <Form.Group as={Col} md="12">
+                                <Form.Label>Package Cost (USD)</Form.Label>
+                                <Field
+                                  className="form-control"
+                                  type="text"
+                                  id="cost"
+                                  name="cost"
+                                  placeholder="USD"
+                                />
+                                <ErrorMessage
+                                  name="cost"
+                                  component="div"
+                                  className="has-error"
+                                />
+                              </Form.Group>
+                            </Row>
+                            <div className="form-group pb-2">
+                              <Form.Label>Services</Form.Label>
+                              <Select
+                                isMulti
+                                name="mappedServices"
+                                options={services?.mappedServices}
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                                onChange={(data) =>
+                                  onServiceSelectChange(data, setFieldValue)
+                                }
+                              />
+                            </div>
+                            <div className="form-group pb-2 ">
+                              <Field type="checkbox" name="isChangeable" />
+                              <label htmlFor="isChangeable" className="h3 p-2">
+                                Can this Package be modified?
+                              </label>
+                            </div>
+                            <Row className="p-3">
+                              <Button
+                                className="btn-success"
+                                size="m"
+                                type="submit"
+                              >
+                                Submit
+                              </Button>
+                            </Row>
+                          </FormikForm>
+                        )}
+                      </Formik>
